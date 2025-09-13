@@ -30,11 +30,14 @@ const Main = async()=>{
     write()
 
     stream.on("drain",()=>{
+        console.log("draining")
         write()
     })
 
     stream.on("finish",()=>{
         console.log("done")
+        
+console.timeEnd("test")
     })
 
 
@@ -44,5 +47,3 @@ const Main = async()=>{
 }
 Main()
 
-
-console.timeEnd("test")
