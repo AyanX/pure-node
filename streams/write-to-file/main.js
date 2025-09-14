@@ -1,48 +1,39 @@
 
-console.time("test")
-
-const fs = require("fs/promises")
+const fs = require("fs")
 const Main = async()=>{
-
-    const file = await fs.open("test.txt","w")
-    const stream = file.createWriteStream()
+    const stream = fs.createWriteStream("test.txt")
 
     let i =0
 
     const write =async ()=>{
         while(i<1000000){
 
-            const buff = Buffer.from(`${i} \n`)
-
-           if (!stream.writable){
-            break
-           }
-
-           
-
-           i++
-            stream.write(buff)
-            if (i == 1000000-1){
-                stream.end()
-           }
+            const chunkSize = 1000;
+            let chunk = ""
+            for (let j = 0; j < chunkSize && i < 1000000; j++) {
+                const buff = Buffer.from(`${i} \n`);
+                chunk += buff.toString();
+                i++;
+            }
+            if (!stream.write(chunk)) {
+                return
+            }
         }
+        stream.end()
     }
     write()
 
     stream.on("drain",()=>{
-        console.log("draining")
         write()
     })
 
     stream.on("finish",()=>{
         console.log("done")
-        
-console.timeEnd("test")
+        stream.close()
     })
-
-
-
-    await file.close()
+    stream.on("error",(err)=>{
+        console.log(err)
+    })
 
 }
 Main()
