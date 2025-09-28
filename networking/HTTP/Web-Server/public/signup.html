@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Sign Up - Notes App</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<style>
+    :root {
+  --bg1: #0f1724;
+  --bg2: #07102a;
+  --accent: #7c3aed;
+  --accent2: #06b6d4;
+  --glass: rgba(255, 255, 255, 0.06);
+  --white: #e6eef8;
+  --muted: #9fb0c8;
+  --radius: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
+body {
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.12), transparent),
+              radial-gradient(900px 400px at 90% 85%, rgba(6,182,212,0.06), transparent),
+              linear-gradient(180deg, var(--bg1), var(--bg2));
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  overflow: hidden;
+}
+
+.card {
+  width: min(420px, 96%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  border-radius: var(--radius);
+  padding: 36px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 10px 40px rgba(2,6,23,0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+h1 {
+  margin: 0;
+  font-size: 28px;
+  text-align: center;
+}
+
+p.lead {
+  color: var(--muted);
+  margin: 8px 0 0;
+  text-align: center;
+  font-size: 14px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+input {
+  background: var(--glass);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 12px;
+  color: var(--white);
+  font-size: 15px;
+  outline: none;
+}
+
+input::placeholder {
+  color: var(--muted);
+}
+
+.btn {
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(99,102,241,0.18);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+}
+
+a {
+  color: var(--accent2);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+</style>
+<body>
+  <div class="card">
+    <h1>Sign Up</h1>
+    <form id="signupForm">
+      <input type="text" id="name" placeholder="Your Name" required/>
+      <input type="text" id="username" placeholder="Username" required/>
+      <input type="password" id="password" placeholder="Password" required/>
+      <button type="submit" class="btn">Sign Up</button>
+    </form>
+    <p class="lead">Already have an account? <a href="login.html">Login</a></p>
+  </div>
+
+  <script>
+    const signupForm = document.getElementById('signupForm');
+    signupForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      try {
+        const res = await fetch("http://localhost:3000/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, username, password })
+        });
+
+        if(res.ok){
+          window.location.href = "login.html";
+        } else {
+          alert("Signup failed, try again.");
+        }
+      } catch(err){
+        console.error(err);
+        alert("Error signing up.");
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "web-server",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+     "start": "concurrently \"nodemon proxy/proxy.js\" \"nodemon server1.js\" \"nodemon server2.js\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

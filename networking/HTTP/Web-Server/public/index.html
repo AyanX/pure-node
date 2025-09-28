@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Notes App</title>
+<style>
+  :root{
+    --bg1:#0f1724; --bg2:#07102a; --accent:#7c3aed; --accent2:#06b6d4; --glass: rgba(255,255,255,0.06);
+    --white: #e6eef8;
+    --muted: #9fb0c8;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box}
+  html,body{
+    min-height:100%; /* ✅ allow height to grow with content */
+    margin:0;
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial
+  }
+  body{
+    background: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.12), transparent),
+                radial-gradient(900px 400px at 90% 85%, rgba(6,182,212,0.06), transparent),
+                linear-gradient(180deg,var(--bg1),var(--bg2));
+    color:var(--white);
+    display:flex;
+    justify-content:center;
+    padding:40px;
+    overflow-y:auto;   /* ✅ scroll when content overflows */
+    align-items:flex-start; /* ✅ start content from top instead of centering vertically */
+  }
+
+  .card{
+    width:min(820px,96%);
+    background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);
+    border-radius:var(--radius);
+    padding:36px;
+    backdrop-filter:blur(6px);
+    box-shadow:0 10px 40px rgba(2,6,23,0.6);
+    display:flex;
+    flex-direction:column;
+    gap:28px;
+    align-items:center;
+    position:relative;
+    overflow:hidden;
+    margin-bottom:60px; /* ✅ space at bottom for scrolling */
+  }
+
+  h1{margin:0;font-size:32px;text-align:center}
+  p.lead{color:var(--muted);margin:8px 0 18px;text-align:center}
+
+  .actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  .btn{
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    border:none;
+    padding:12px 18px;
+    border-radius:10px;
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:0 6px 20px rgba(99,102,241,0.18);
+    transition:transform .15s ease,box-shadow .15s ease;
+    position:relative;
+    overflow:hidden
+  }
+  .btn:hover{transform:translateY(-3px)}
+  .btn.secondary{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.06);
+    color:var(--white)
+  }
+
+  form{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    width:100%;
+    max-width:500px
+  }
+  input,textarea{
+    background:var(--glass);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px;
+    padding:12px;
+    color:var(--white);
+    font-size:15px;
+    outline:none
+  }
+  input::placeholder,textarea::placeholder{color:var(--muted)}
+  textarea{resize:vertical;min-height:100px}
+
+  .planet{
+    position:absolute;
+    left:-120px;
+    bottom:-60px;
+    width:260px;
+    height:260px;
+    border-radius:50%;
+    background:conic-gradient(from 120deg, rgba(255,255,255,0.03), rgba(124,58,237,0.07));
+    box-shadow:inset -20px -10px 60px rgba(0,0,0,0.55)
+  }
+  @media (max-width:600px){
+    h1{font-size:24px}
+    .planet{width:160px;height:160px;bottom:-80px;}
+  }
+
+  .ripple{
+    position:absolute;
+    border-radius:50%;
+    transform:scale(0);
+    animation:ripple .6s linear;
+    pointer-events:none;
+    background:rgba(255,255,255,0.12)
+  }
+  @keyframes ripple{to{transform:scale(4);opacity:0}}
+</style>
+
+</head>
+<body>
+
+
+
+  <div class="card">
+    <h1>Welcome to Notes</h1>
+    <p class="lead">Post and manage your personal notes easily</p>
+
+    <div class="actions">
+      <button class="btn" id="loginBtn">Login</button>
+      <button class="btn secondary" id="signupBtn">Sign Up</button>
+    </div>
+
+    <form id="noteForm">
+      <input type="text" id="title" placeholder="Note Title" required />
+      <textarea id="content" placeholder="Write your note here..." required></textarea>
+      <button type="submit" class="btn">Submit Note</button>
+    </form>
+
+    <div class="planet"></div>
+  </div>
+
+  
+  <script>
+  window.addEventListener("DOMContentLoaded", async ()=>{
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    const actions = document.querySelector(".actions");
+    const noteForm = document.getElementById("noteForm");
+    const card = document.querySelector(".card");
+
+    if(userData){
+      // Hide login/signup
+      actions.style.display = "none";
+
+      // Show note form
+      noteForm.style.display = "flex";
+
+      // Add user icon + username
+      const header = document.createElement("div");
+      header.style.position = "absolute";
+      header.style.top = "20px";
+      header.style.right = "20px";
+      header.style.display = "flex";
+      header.style.alignItems = "center";
+      header.innerHTML = `<span style="margin-right:8px;">👤 ${userData.username}</span>`;
+      document.body.appendChild(header);
+
+      // Fetch posts
+      try {
+        const res = await fetch("http://localhost:3000/posts");
+        if(res.ok){
+          const posts = await res.json();
+          const postsContainer = document.createElement("div");
+          postsContainer.style.width = "100%";
+          postsContainer.style.marginTop = "20px";
+
+          posts.forEach(post=>{
+            const p = document.createElement("div");
+            p.style.background = "var(--glass)";
+            p.style.border = "1px solid rgba(255,255,255,0.08)";
+            p.style.borderRadius = "12px";
+            p.style.padding = "16px";
+            p.style.marginBottom = "12px";
+            p.innerHTML = `
+              <h3>${post.postTitle}</h3>
+              <p>${post.post}</p>
+              <small>By ${post.author}</small>
+            `;
+            postsContainer.appendChild(p);
+          });
+
+          card.appendChild(postsContainer);
+        }
+      } catch (err){
+        console.error("Error fetching posts:", err);
+      }
+    } else {
+      // Not logged in → hide note form
+      noteForm.style.display = "none";
+    }
+
+    // Button listeners (only active if visible)
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+
+    if(loginBtn){
+      loginBtn.addEventListener('click', (e)=>{
+        rip(loginBtn, e);
+        window.location.href = 'login.html';
+      });
+    }
+
+    if(signupBtn){
+      signupBtn.addEventListener('click', (e)=>{
+        rip(signupBtn, e);
+        window.location.href = 'signup.html';
+      });
+    }
+
+    noteForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      rip(noteForm.querySelector('button'));
+      const title = document.getElementById('title').value.trim();
+      const content = document.getElementById('content').value.trim();
+      try{
+        if(title && content){
+        // Here I send the note to the server
+        fetch("http://localhost:3000/posts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+           title,
+          content,
+          author: userData.username
+        })
+        })
+        .then(res => {
+          if(res.status === 201){
+            noteForm.reset();
+            window.location.href = "/"; // Refresh to show new note
+          }
+        });
+      }
+      else{
+        alert("Please fill in both title and content.");  
+      } 
+      }
+      catch(e){
+        alert("Error submitting note. Please try again.");
+      }
+    
+    });
+
+    // ripple effect
+    function rip(el, ev){
+      const rect = el.getBoundingClientRect();
+      const r = document.createElement('span');
+      r.className = 'ripple';
+      const size = Math.max(rect.width, rect.height)*2;
+      r.style.width = r.style.height = size + 'px';
+      const x = (ev && ev.clientX ? ev.clientX : rect.left + rect.width/2) - rect.left - size/2;
+      const y = (ev && ev.clientY ? ev.clientY : rect.top + rect.height/2) - rect.top - size/2;
+      r.style.left = x + 'px'; r.style.top = y + 'px';
+      el.appendChild(r);
+      r.addEventListener('animationend', ()=>r.remove());
+    }
+  });
+
+  const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const noteForm = document.getElementById('noteForm');
+
+    loginBtn.addEventListener('click', (e)=>{
+      rip(loginBtn, e);
+      window.location.href = 'login.html';
+    });
+
+    signupBtn.addEventListener('click', (e)=>{
+      rip(signupBtn, e);
+      window.location.href = 'signup.html';
+    });
+
+    // ripple effect
+    function rip(el, ev){
+      const rect = el.getBoundingClientRect();
+      const r = document.createElement('span');
+      r.className = 'ripple';
+      const size = Math.max(rect.width, rect.height)*2;
+      r.style.width = r.style.height = size + 'px';
+      const x = (ev && ev.clientX ? ev.clientX : rect.left + rect.width/2) - rect.left - size/2;
+      const y = (ev && ev.clientY ? ev.clientY : rect.top + rect.height/2) - rect.top - size/2;
+      r.style.left = x + 'px'; r.style.top = y + 'px';
+      el.appendChild(r);
+      r.addEventListener('animationend', ()=>r.remove());
+    }
+
+</script>
+</body>
+</html>
