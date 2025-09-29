@@ -10,7 +10,12 @@ const server = new Ayan();
 
 const PORT = process.env.PORT || 3001
 
+server.use(server.parse()) // to parse json data
 
+server.use((req, res, next) => {
+    console.log(`Middleware 1: ${req.method} ${req.url}`);
+    next()
+})
 
 
 server.get('/', (req, res) => {
@@ -32,7 +37,11 @@ server.get('/signup.html', (req, res) => {
     return getSignUp(res)
 })
 
-server.get('/posts', (req, res) => {
+const trying = (req,res)=>{
+    console.log("Trying middleware");
+}
+
+server.get('/posts', trying, (req, res) => {
     return getPosts(req, res);
 });
 
@@ -41,9 +50,9 @@ server.post("/login",(req,res)=>{
 })
 
 server.post("/posts",(req,res)=>{
-    console.log("New post request received to create a new post");
    return newPost(req,res)
 })
+
 
 
 server.listen(PORT, () => {

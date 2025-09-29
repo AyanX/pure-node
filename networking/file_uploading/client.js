@@ -5,7 +5,9 @@ const path = require("path");
 const fsPromises = require("fs/promises");
 //create a connection here
 
-const socket = net.createConnection("5000", async () => {
+
+
+const socket = net.createConnection("5005", async () => {
   const pathName = process.argv[2];
 
   if (!pathName) {
@@ -50,6 +52,7 @@ const socket = net.createConnection("5000", async () => {
 
   rStream.on("end", () => {
     console.log("File sent successfully");
+    rStream.close();
     socket.end();
   });
   socket.on("drain", () => {
