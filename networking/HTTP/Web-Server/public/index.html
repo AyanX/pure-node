@@ -159,7 +159,7 @@
       header.style.right = "20px";
       header.style.display = "flex";
       header.style.alignItems = "center";
-      header.innerHTML = `<span style="margin-right:8px;">👤 ${userData.username}</span>`;
+      header.innerHTML = `<span style="margin-right:8px;">   <button class="btn" id="logoutBtn">Log Out</button> 👤 ${userData.username}</span>`;
       document.body.appendChild(header);
 
       // Fetch posts
@@ -198,6 +198,7 @@
 
     // Button listeners (only active if visible)
     const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
     const signupBtn = document.getElementById('signupBtn');
 
     if(loginBtn){
@@ -205,6 +206,13 @@
         rip(loginBtn, e);
         window.location.href = 'login.html';
       });
+    }
+
+    if(logoutBtn){
+      logoutBtn.addEventListener('click', (e)=>{
+        localStorage.removeItem("userData")
+        window.location.href = "/";
+      })
     }
 
     if(signupBtn){

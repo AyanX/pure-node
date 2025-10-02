@@ -4,12 +4,7 @@ const { sessions } = require("../views/sessions.js");
 
 
 const loginPost = async (req,res)=>{
-    let body = '';
-    req.on('data', chunk => {
-        body += chunk.toString(); //  Buffer to string
-    });
-    req.on('end', () => {
-        const { username, password } = JSON.parse(body);
+        const { username, password } = req.body
         // Validate credentials
         const user = users.find(u => u.username === username && u.password === password);
         if (user) {
@@ -21,29 +16,33 @@ const loginPost = async (req,res)=>{
             res.writeHead(401, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ message: 'Invalid credentials' }));
         }
-    });
+        return
 }
 
 const newPost =async (req,res)=>{
-    
-    let body = '';
-    console.log("Request body:",req.body);
-
-   
-        console.log("posts",posts)
         const { title, content ,author} = req.body
         //  save the post to our little database
-        console.log("Creating new post:", { title, content, author });
         posts.unshift({ id: posts.length + 1, postTitle:title, post: content,author });
-        console.log(posts);
         //status 201 Created
         res.writeHead(201, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ title, content, author }));
-   
+}
+
+const signupPost = (req,res)=>{
+    //  name, username, password 
+
+    const {username,password} = req.body
+    if(!username || !password){
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+       return res.end(JSON.stringify({ message: 'Invalid credentials' }));
+    }
+
+    users.push({username,password})
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+         return   res.end(JSON.stringify({ message: 'user created' }));
 
 }
 
-
 module.exports = {
-    loginPost, newPost
+    loginPost, newPost,signupPost
 };

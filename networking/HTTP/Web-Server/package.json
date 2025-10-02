@@ -4,7 +4,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-     "start": "concurrently \"nodemon proxy/proxy.js\" \"nodemon server1.js\" \"nodemon server2.js\""
+    "start": "concurrently \"node proxy/proxy.js\" \"node server1.js\" \"node server2.js\"",
+    "proxy": "concurrently \"nodemon proxy/proxy.js\" \"nodemon server1.js\" \"nodemon server2.js\""
   },
   "keywords": [],
   "author": "",

@@ -4,7 +4,8 @@ const {
     getHomepage,getPosts, getLogin, getSignUp
 } = require('./controllers/get.controller');
 
-const { loginPost ,newPost } = require('./controllers/post.controller');
+const { loginPost ,newPost, signupPost } = require('./controllers/post.controller');
+const isLoggedIn = require('./controllers/auth');
 
 const server = new Ayan();
 
@@ -37,11 +38,7 @@ server.get('/signup.html', (req, res) => {
     return getSignUp(res)
 })
 
-const trying = (req,res)=>{
-    console.log("Trying middleware");
-}
-
-server.get('/posts', trying, (req, res) => {
+server.get('/posts', (req, res) => {
     return getPosts(req, res);
 });
 
@@ -49,7 +46,11 @@ server.post("/login",(req,res)=>{
    return loginPost(req,res)
 })
 
-server.post("/posts",(req,res)=>{
+server.post("/signup",(req,res)=>{
+   return signupPost(req,res)
+})
+
+server.post("/posts",  isLoggedIn,(req,res)=>{
    return newPost(req,res)
 })
 
