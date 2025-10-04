@@ -1,7 +1,9 @@
-arg="$1"
+
+alias build="chmod +x ./scripts.sh &&  ./scripts.sh"
 
 catty() {
-     node cat.js "$arg" 0> node from.js
-}
+node /c/Users/xhady\ ayan/Desktop/Coding/pure-node/UNIX/cat-replica/cat.js "$1" | \
+node /c/Users/xhady\ ayan/Desktop/Coding/pure-node/UNIX/cat-replica/from.js
 
-catty 
+}
+catty "$1"

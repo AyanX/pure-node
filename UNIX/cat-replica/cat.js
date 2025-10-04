@@ -1,18 +1,27 @@
 
-const {stdin, stdout} = require("node:process")
-const fs = require("node:fs")
+const {stdout} = require("node:process") 
+
+const fs = require("node:fs");
+const path = require("node:path");
+
+const fileName = process.argv[2]
+
+const filePath = path.resolve(process.cwd(), fileName);
 
 
-const filePath = process.argv[2]
+fs.stat(filePath, (err, stats) => {
+    if (err) {
+        console.error(`file does not exist: ${filePath}`);
+        return;
+    }
 
-const stream = fs.createReadStream(filePath)
+    if (stats.isDirectory()) {
+        console.error("Error: cannot read, it's a directory!" , `${filePath}`);
+        return;
+    }
 
-if(filePath){
-stream.on("data", data=>stdout.write(data.toString()))
-stream.on("end", ()=>{
-     stdout.write("\n")
-    process.exit(0)
-    })
-}
+    const stream = fs.createReadStream(filePath);
 
+    stream.on("data", data => process.stdout.write(data));
+});
 
